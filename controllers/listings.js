@@ -47,24 +47,18 @@ module.exports.createListing = async (req, res, next) => {
         const { lat, lon } = response.data[0]; // Extract coordinates
 
         // Create the new listing with coordinates
-        const listingData = {
-            ...req.body.listing,
-            owner: req.user._id,
-            geometry: {
-                type: "Point",
-                coordinates: [parseFloat(lon), parseFloat(lat)],
-            },
-        };
-
-         if (req.file) {
-            listingData.image = {
+        const newListing = new Listing({
+            ...req.body.listing, // Spread listing fields from form
+            owner: req.user._id, // Set current user as owner
+            image: {
                 url: req.file.path,
                 filename: req.file.filename,
-            };
-        }
-
-        const newListing = new Listing(listingData);
-        
+            },
+            geometry: {
+                type: "Point", // GeoJSON format
+                coordinates: [parseFloat(lon), parseFloat(lat)],
+            },
+        });
 
         await newListing.save(); // Save to DB
         req.flash("success", "New Listing Created!");
