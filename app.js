@@ -71,7 +71,9 @@ const sessionOptions = {
         httpOnly: true, // Cookie not accessible via client-side JS
     },
 }
-
+app.get('/', (req, res) => {
+  res.send('Welcome to AuroraBnb');
+});
 
 // Initialize session and flash message
 app.use(session(sessionOptions));
