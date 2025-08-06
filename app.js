@@ -71,10 +71,6 @@ const sessionOptions = {
         httpOnly: true, // Cookie not accessible via client-side JS
     },
 }
-app.get('/', (req, res) => {
-  res.send('Welcome to AuroraBnb');
-});
-
 // Initialize session and flash message
 app.use(session(sessionOptions));
 app.use(flash());
@@ -96,6 +92,9 @@ app.use((req, res, next)=>{
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+app.get('/', (req, res) => {
+  res.redirect('/listings');
+});
 
 
 app.use("/listings", listingRouter);
