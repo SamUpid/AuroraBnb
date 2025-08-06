@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Error <%= statusCode %></title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+        h1 { color: #d9534f; }
+        a { color: #337ab7; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Error <%= statusCode %></h1>
+    <p><%= message %></p>
+    <a href="/listings">← Back to Listings</a>
+</body>
+</html>

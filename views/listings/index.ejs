@@ -1,0 +1,159 @@
+<% layout("/layouts/boilerplate") %>
+
+<!-- FILTER BAR SECTION -->
+<div id="filters">
+  <div class="scrollable-tabs-container">
+    <!-- LEFT SCROLL ARROW -->
+    <div class="left-arrow" aria-label="Scroll left" role="button" tabindex="0" aria-pressed="false">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      </svg>
+    </div>
+
+    <!-- FILTER BUTTONS -->
+    <div class="filter-container">
+      <% const filters = [
+        { label: "ALL", icon: "fa-house", url: "/listings" },
+        { label: "Iconic cities", icon: "fa-mountain-city", url: "/listings/filter/Iconic cities" },
+        { label: "Mountains", icon: "fa-mountain", url: "/listings/filter/Mountains" },
+        { label: "Castles", icon: "fa-fort-awesome", isBrand: true, url: "/listings/filter/Castles" },
+        { label: "Amazing pools", icon: "fa-person-swimming", url: "/listings/filter/Amazing pools" },
+        { label: "Camping", icon: "fa-campground", url: "/listings/filter/Camping" },
+        { label: "Farms", icon: "fa-cow", url: "/listings/filter/Farms" },
+        { label: "Arctic", icon: "fa-snowflake", isRegular: true, url: "/listings/filter/Arctic" },
+        { label: "Domes", icon: "fa-igloo", url: "/listings/filter/Domes" },
+        { label: "Boats", icon: "fa-ship", url: "/listings/filter/Boats" }
+      ]; %>
+
+      <% filters.forEach(filter => { %>
+        <a class="filter" href="<%= filter.url %>">
+          <div>
+            <i class="fa<%= filter.isBrand ? '-brands' : filter.isRegular ? '-regular' : '-solid' %> <%= filter.icon %>"></i>
+          </div>
+          <p><%= filter.label %></p>
+        </a>
+      <% }) %>
+    </div>
+
+    <!-- RIGHT SCROLL ARROW -->
+    <div class="right-arrow active" aria-label="Scroll right" role="button" tabindex="0">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- TAX TOGGLE SWITCH -->
+  <div class="tax-toggle">
+    <div class="form-check-reverse form-switch">
+      <input class="form-check-input" type="checkbox" role="switch" id="flexswitchCheckDefault" />
+      <label class="form-check-label" for="flexswitchCheckDefault">Display total after taxes</label>
+    </div>
+  </div>
+</div>
+
+<!-- LISTINGS GRID -->
+<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
+  <% for (let listing of allListings) { const priceNum = Number(listing.price); %>
+    <a href="/listings/<%= listing._id %>" class="listing-link">
+      <div class="card col listing-card">
+        <img src="<%= listing.image?.url %>" class="card-img-top" alt="<%= listing.title || 'Listing image' %>" style="height: 20rem" />
+        <div class="card-img-overlay"></div>
+        <div class="card-body">
+          <p class="card-text">
+            <b><%= listing.title %></b><br>
+            <span class="price-info" data-base-price="<%= priceNum %>">
+              <%= !isNaN(priceNum) ? priceNum.toLocaleString("de-DE", { style: "currency", currency: "EUR" }) : "N/A" %> / night
+            </span>
+            <i class="tax-info"> &nbsp;&nbsp;+9% Tax</i>
+          </p>
+        </div>
+      </div>
+    </a>
+  <% } %>
+</div>
+
+<!-- JAVASCRIPT FUNCTIONALITY -->
+<script>
+  // Handle tax switch toggle
+  document.getElementById("flexswitchCheckDefault").addEventListener("change", (e) => {
+    updatePriceDisplay(e.target.checked);
+  });
+
+  function updatePriceDisplay(isTaxIncluded) {
+    document.querySelectorAll(".price-info").forEach(el => {
+      const base = parseFloat(el.dataset.basePrice);
+      const finalPrice = isTaxIncluded ? base * 1.09 : base;
+      el.innerHTML = `${finalPrice.toLocaleString("de-DE", { style: "currency", currency: "EUR" })} / night`;
+      if (isTaxIncluded) el.innerHTML += ` <i class="tax"> &nbsp;with 9% Tax</i>`;
+    });
+  }
+
+  // Filter tab activation + localStorage
+  const tabs = document.querySelectorAll(".filter-container .filter");
+  const filterContainer = document.querySelector(".filter-container");
+
+  function removeActive() {
+    tabs.forEach(tab => tab.classList.remove("active"));
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", (e) => {
+      e.preventDefault();
+      removeActive();
+      tab.classList.add("active");
+      localStorage.setItem("activeFilter", tab.getAttribute("href"));
+      window.location.href = tab.getAttribute("href");
+    });
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const stored = localStorage.getItem("activeFilter");
+    if (stored) {
+      const match = document.querySelector(`.filter[href="${stored}"]`);
+      if (match) match.classList.add("active");
+    }
+  });
+
+  // Horizontal scroll arrow visibility + drag handling
+  const leftArrow = document.querySelector(".left-arrow");
+  const rightArrow = document.querySelector(".right-arrow");
+
+  function manageArrowVisibility() {
+    const maxScroll = filterContainer.scrollWidth - filterContainer.clientWidth - 20;
+    leftArrow.classList.toggle("active", filterContainer.scrollLeft > 20);
+    rightArrow.classList.toggle("active", filterContainer.scrollLeft < maxScroll);
+  }
+
+  rightArrow.addEventListener("click", () => {
+    filterContainer.scrollLeft += 200;
+    setTimeout(manageArrowVisibility, 300);
+  });
+
+  leftArrow.addEventListener("click", () => {
+    filterContainer.scrollLeft -= 200;
+    setTimeout(manageArrowVisibility, 300);
+  });
+
+  filterContainer.addEventListener("scroll", manageArrowVisibility);
+
+  // Mouse dragging scroll support
+  let isDragging = false;
+  filterContainer.addEventListener("mousedown", () => isDragging = true);
+  filterContainer.addEventListener("mouseup", () => isDragging = false);
+  filterContainer.addEventListener("mouseleave", () => isDragging = false);
+  filterContainer.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+    filterContainer.scrollLeft -= e.movementX;
+    manageArrowVisibility();
+  });
+
+  // Keyboard arrow navigation for accessibility
+  [leftArrow, rightArrow].forEach(arrow => {
+    arrow.addEventListener("keydown", (e) => {
+      if (["Enter", " "].includes(e.key)) {
+        arrow.click();
+      }
+    });
+  });
+</script>

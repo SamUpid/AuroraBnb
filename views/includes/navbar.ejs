@@ -1,0 +1,177 @@
+
+
+<style>
+
+   .search-btn {
+    background-color: #fe424d;
+    color: #fff;
+    border-radius: 25px;
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+  }
+
+  .search-btn p{
+    margin: 0;
+  }
+
+  .search-btn:hover {
+   background-color: #d93c3c;
+  }
+
+  .search-btn i {
+    display: inline;
+    margin-right: 0.5rem;
+  }
+
+  .search-inp {
+    border-radius: 25px;
+    padding: 0.5rem 3rem;
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  /* Hamburger custom toggle */
+  .checkboxtoggler {
+    width: 2.5em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    cursor: pointer;
+    margin-left: 1rem;
+  }
+
+  .checkboxtoggler div {
+    background: #fe424d;
+    height: 0.3em;
+    border-radius: 10em;
+    transition: transform 0.4s ease;
+  }
+
+  #toggleChecker {
+    display: none;
+  }
+
+  #toggleChecker:checked + #togglerLabel .line-1 {
+    transform: rotate(45deg) translate(0.4em, 0.4em);
+  }
+
+  #toggleChecker:checked + #togglerLabel .line-2 {
+    transform: rotate(-45deg) translate(0.3em, -0.3em);
+  }
+
+   #toggleChecker:checked + #togglerLabel .line-3 {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .nav-profile {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    top: 3.5rem;
+    right: 1rem;
+    min-height: 8rem;
+    min-width: 10rem;
+    padding: 1.2rem;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.3);
+    gap: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1000;
+  }
+
+  .nav-profile a:hover {
+    color: #fe424d;
+  }
+
+  /* Responsive fix: make search and toggle stack vertically on small screens */
+  @media (max-width: 768px) {
+    .navbar-nav.form-nav {
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+
+    .form-nav form {
+      width: 100%;
+    }
+
+    .search-inp {
+      width: 100%;
+    }
+
+    .search-btn {
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+  }
+
+</style>
+
+<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
+  <div class="container-fluid d-flex align-items-center justify-content-between">
+    <!-- Brand icon will be of hotel-->
+    <a class="navbar-brand" href="/listings">
+      <i class="fa-solid fa-hotel"></i>
+    </a>
+
+    <!-- Search Bar -->
+
+    <div class="navbar-nav form-nav d-none d-md-flex">
+      <form class="d-flex" role="search" action="/listings/search" method="get">
+        <input class="form-control me-2 search-inp" type="search" placeholder="Search destinations" name="q" />
+        <button class="btn search-btn" type="submit">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <p>Search</p>
+      </button>
+
+      </form>
+    </div>
+
+       <!-- Hamburger Toggle -->
+    <input id="toggleChecker" type="checkbox" />
+    <label id="togglerLabel" for="toggleChecker">
+      <div class="checkboxtoggler">
+        <div class="line-1"></div>
+        <div class="line-2"></div>
+        <div class="line-3"></div>
+      </div>
+    </label>
+
+        <!-- Profile Menu -->
+    <div class="nav-profile">
+      <a class="nav-link" href="/listings/new">AuroraBnb your listing</a>
+      <% if (!currUser) { %>
+        <a class="nav-link" href="/signup"><b>Sign up</b></a>
+        <a class="nav-link" href="/login"><b>Log in</b></a>
+      <% } else { %>
+        <a class="nav-link" href="/logout"><b>Log out</b></a>
+      <% } %>
+    </div>
+  </div>
+</nav>
+
+
+<script>
+  const hamMenu = document.querySelector("#toggleChecker");
+  const profileMenu = document.querySelector(".nav-profile");
+
+hamMenu.addEventListener("click", () => {
+  if (profileMenu.style.visibility !== "visible") {
+    profileMenu.style.visibility = "visible";
+    profileMenu.style.opacity = 1;
+  } else {
+    profileMenu.style.visibility = "hidden";
+    profileMenu.style.opacity = 0;
+  }
+});
+
+</script>

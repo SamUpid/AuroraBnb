@@ -1,0 +1,80 @@
+<% layout("/layouts/boilerplate") %>
+    <div class="row mt-3">
+    <div class="col-sm-8 offset-sm-2 px-3">
+        <br/> <br/>
+    <h3>Create a New Listing</h3>
+    <%# Form for new listing creation with file upload support %>
+    <form method="POST" action="/listings" novalidate class="needs-validation" enctype="multipart/form-data">
+        <div class="mb-3">
+             <label for="title" class="form-label">Title</label>
+            <input name="listing[title]" placeholder="Add a catchy title" type="text" class="form-control"
+            required
+            />
+            <div class="valid-feedback">Title looks good!</div>
+        </div>
+
+        <div class="mb-3">
+             <label for="description" class="form-label">Description</label>
+            <textarea type="text" name="listing[description]"  class="form-control" required></textarea>
+            <div class="invalid-feedback">Please enter a short description</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="image" class="form-label">Uplode Listing Image</label>
+            <input name="listing[image]"  type="file" class="form-control"/>
+            required
+        </div>
+
+        <div class="mb-3">
+                    <label for="validationCustom04" class="form-label">Category</label>
+                    <select class="form-select" id="validationCustom04" name="listing[category]" required>
+                      <option selected disabled value="">Select a category</option>
+                      <option value="Iconic cities">Iconic cities</option>
+                      <option value="Mountains">Mountains</option>
+                      <option value="Castles">Castles</option>
+                      <option value="Amazing pools">Amazing pools</option>
+                      <option value="Camping">Camping</option>
+                      <option value="Farms">Farms</option>
+                      <option value="Arctic">Arctic</option>
+                      <option value="Domes">Domes</option>
+                      <option value="Boats">Boats</option>
+                    </select>
+                    <div class="invalid-feedback">
+                      Please select a valid category.
+                    </div>
+                  </div>
+
+<%# Price and country in responsive row %>
+        <div class="row">
+
+              <%# Price input (1/3 width on medium screens) %>
+             <div class="mb-3 col-md-4">
+             <label for="price" class="form-label">Price</label>
+              <input name="listing[price]" placeholder="1200"  class="form-control" type="number" required/>
+              <div class="invalid-feedback">Please enter a valid price</div>
+        </div>
+       
+        <%# Country input (2/3 width on medium screens) %>
+                
+        <div class="mb-3 col-md-8">
+             <label for="country" class="form-label">Country</label>
+             <input name="listing[country]" placeholder="Hungary" text="text" class="form-control" required/>
+             <div class="invalid-feedback">Please enter a valid country name</div>
+
+        </div>
+
+        </div>
+       
+
+        <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <input name="listing[location]" placeholder="Budapest" type="text" class="form-control" required/>
+            <div class="invalid-feedback">Please enter a valid location</div>
+
+        </div>
+
+        <button class="btn btn-dark add-btn mt-3">Add</button>
+        <br/> <br/>
+    </form>
+    </div>
+</div>
