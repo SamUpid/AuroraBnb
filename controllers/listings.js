@@ -30,45 +30,59 @@ module.exports.showListings = async (req, res)=>{
     res.render("listings/show.ejs", {listing});
 };
 
-// Create a new listing
+
 module.exports.createListing = async (req, res, next) => {
     try {
-        // Geocode the location using OpenStreetMap Nominatim API
-        const response = await axios.get(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(req.body.listing.location)}&limit=1`
+        // Geocode location using OpenStreetMap (Nominatim API)
+        const geoResponse = await axios.get(
+            `https://nominatim.openstreetmap.org/search`,
+            {
+                params: {
+                    format: 'json',
+                    q: req.body.listing.location,
+                    limit: 1,
+                },
+                headers: {
+                    'User-Agent': 'AuroraBnB/1.0 (your_email@example.com)' // Replace this with real info
+                }
+            }
         );
 
-        // If no location found, show error
-        if (response.data.length === 0) {
+        if (geoResponse.data.length === 0) {
             req.flash("error", "Location not found!");
             return res.redirect("/listings/new");
         }
 
-        const { lat, lon } = response.data[0]; // Extract coordinates
+        const { lat, lon } = geoResponse.data[0];
 
-        // Create the new listing with coordinates
-        const newListing = new Listing({
-            ...req.body.listing, // Spread listing fields from form
-            owner: req.user._id, // Set current user as owner
-            image: {
-                url: req.file.path,
-                filename: req.file.filename,
-            },
-            geometry: {
-                type: "Point", // GeoJSON format
-                coordinates: [parseFloat(lon), parseFloat(lat)],
-            },
-        });
+        // Image upload check
+        let url = req.file?.path || "";
+        let filename = req.file?.filename || "";
 
-        await newListing.save(); // Save to DB
+        // Create listing
+        const newListing = new Listing(req.body.listing);
+        newListing.owner = req.user._id;
+        newListing.image = { url, filename };
+
+        // Attach GeoJSON geometry
+        newListing.geometry = {
+            type: "Point",
+            coordinates: [parseFloat(lon), parseFloat(lat)]
+        };
+
+        // Save to DB
+        const savedListing = await newListing.save();
+        console.log("[Listing Created]:", savedListing);
+
         req.flash("success", "New Listing Created!");
         res.redirect("/listings");
     } catch (err) {
-        // Catch any error during listing creation
+        console.error("[Listing Creation Error]:", err.message);
         req.flash("error", "Failed to create listing. Please try again.");
         res.redirect("/listings/new");
     }
 };
+
 
 // Render the edit form for a listing
     module.exports.renderEditForm = async (req, res) => {
