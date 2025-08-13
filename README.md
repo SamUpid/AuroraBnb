@@ -4,20 +4,8 @@
   <img width="1600" height="1000" alt="AuroraBnb Screenshot" src="https://github.com/user-attachments/assets/a31d44d9-fcfb-4f0a-adb2-1d09aea302bf" />
 
   <br><br>
-  <a href="https://aurorabnb.onrender.com" target="_blank" style="text-decoration:none;">
-    <div style="
-      display:inline-block;
-      background: linear-gradient(90deg, #2E7D32, #4CAF50);
-      color: white;
-      padding: 15px 40px;
-      border-radius: 12px;
-      font-size: 22px;
-      font-weight: bold;
-      font-family: Arial, sans-serif;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    ">
-      🌐 View Live Demo
-    </div>
+  <a href="https://aurorabnb.onrender.com" target="_blank">
+    <img src="https://img.shields.io/badge/🌐_View_Live_Demo-4CAF50?style=for-the-badge&logo=globe&logoColor=white&labelColor=2E7D32&fontSize=24px" alt="View Live Demo" style="height: 60px; cursor: pointer;">
   </a>
 </div>
 
