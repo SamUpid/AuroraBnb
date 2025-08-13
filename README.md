@@ -2,11 +2,25 @@
 
 <div align="center">
   <img width="1600" height="1000" alt="AuroraBnb Screenshot" src="https://github.com/user-attachments/assets/a31d44d9-fcfb-4f0a-adb2-1d09aea302bf" />
-  
-  [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-Visit_Site-success?style=for-the-badge)](https://aurorabnb.onrender.com)
-  [![MIT License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](#)
-  [![MERN Stack](https://img.shields.io/badge/Stack-MERN-orange?style=for-the-badge)](#)
+
+  <br><br>
+  <a href="https://aurorabnb.onrender.com" target="_blank" style="text-decoration:none;">
+    <div style="
+      display:inline-block;
+      background: linear-gradient(90deg, #2E7D32, #4CAF50);
+      color: white;
+      padding: 15px 40px;
+      border-radius: 12px;
+      font-size: 22px;
+      font-weight: bold;
+      font-family: Arial, sans-serif;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    ">
+      🌐 View Live Demo
+    </div>
+  </a>
 </div>
+
 
 ## 📋 Project Description
 
