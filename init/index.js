@@ -1,5 +1,6 @@
 if (process.env.NODE_ENV !== "production") {
-    require("dotenv").config();
+    require("dotenv").config({ path: __dirname + "/../.env" });
+
 }
 
 const mongoose = require("mongoose");
@@ -15,10 +16,12 @@ main().then(() => {
 });
 
 async function main() {
-    await mongoose.connect(dbUrl);
+     await mongoose.connect(dbUrl);
 }
 
 console.log("ATLASDB_URL is:", dbUrl);
+
+
 
 
 const initDB = async () => {

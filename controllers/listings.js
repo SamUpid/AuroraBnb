@@ -1,5 +1,6 @@
 const axios = require('axios'); // Import axios for making HTTP requests
 const Listing = require("../models/listing"); // Import the Mongoose model for listings
+const aiService = require("../services/aiService");
 
 // Controller for rendering all listings
 module.exports.index = async (req, res)=>{
@@ -13,26 +14,39 @@ module.exports.renderNewForm = (req, res)=>{
 };
 
 // Show a specific listing by ID
-module.exports.showListings = async (req, res)=>{
-    let {id} = req.params;
-    const listing= await Listing.findById(id)
-    .populate({
-            path: "reviews", // Populate reviews
-            populate: {
-                path: "author", // Also populate each review's author
-            }
-        })
-        .populate("owner"); // Populate the listing owner
-    if(!listing){
-        req.flash("error", "Listing you requested does not exist!");
-        return res.redirect("/listings");
+module.exports.showListings = async (req, res) => {
+    try {
+        let { id } = req.params;
+        const listing = await Listing.findById(id)
+            .populate({
+                path: "reviews", // Populate reviews
+                populate: {
+                    path: "author", // Also populate each review's author
+                }
+            })
+            .populate("owner"); // Populate the listing owner
+        
+        if (!listing) {
+            req.flash("error", "Listing you requested does not exist!");
+            return res.redirect("/listings");
+        }
+        res.render("listings/show.ejs", { listing });
+    } catch (error) {
+        console.error('Error fetching listing:', error);
+        req.flash("error", "Failed to load listing");
+        res.redirect("/listings");
     }
-    res.render("listings/show.ejs", {listing});
 };
-
 
 module.exports.createListing = async (req, res, next) => {
     try {
+
+        // Input validation
+        if (!req.body.listing || !req.body.listing.location) {
+            req.flash("error", "Location is required!");
+            return res.redirect("/listings/new");
+        }
+
         // Geocode location using OpenStreetMap (Nominatim API)
         const geoResponse = await axios.get(
             `https://nominatim.openstreetmap.org/search`,
@@ -43,8 +57,9 @@ module.exports.createListing = async (req, res, next) => {
                     limit: 1,
                 },
                 headers: {
-                    'User-Agent': 'AuroraBnB/1.0 (your_email@example.com)' // Replace this with real info
-                }
+                    'User-Agent': 'AuroraBnB/1.0 (nk6513620@gmail.com)' // Replace this with real info
+                },
+                timeout: 15000 //15 second
             }
         );
 
@@ -78,7 +93,16 @@ module.exports.createListing = async (req, res, next) => {
         res.redirect("/listings");
     } catch (err) {
         console.error("[Listing Creation Error]:", err.message);
-        req.flash("error", "Failed to create listing. Please try again.");
+        
+         // Handle specific errors
+        if (err.code === 'ECONNABORTED') {
+            req.flash("error", "Location service timeout. Please try again.");
+        } else if (err.name === 'ValidationError') {
+            req.flash("error", "Please fill all required fields correctly.");
+        } else {
+            req.flash("error", "Failed to create listing. Please try again.");
+        }
+        
         res.redirect("/listings/new");
     }
 };
@@ -95,24 +119,33 @@ module.exports.createListing = async (req, res, next) => {
 
         // Resize the image preview URL for editing display
         let originalImageUrl = listing.image.url;
-        originalImageUrl = originalImageUrl.replace("/upload/", "/upload/c_fill,w_250,h_300/");
+        if (originalImageUrl) {
+            originalImageUrl = originalImageUrl.replace("/upload/", "/upload/c_fill,w_250,h_300/");
+        }      
+        
         res.render("listings/edit.ejs", {listing, originalImageUrl});
     };
 
 
-// Update an existing listing
+    // Update an existing listing
 module.exports.updateListing = async (req, res) => {
     try {
         let { id } = req.params;
         const currentListing = await Listing.findById(id);
         
-        // Construct the update object using new or old values
+        if (!currentListing) {
+            req.flash("error", "Listing not found!");
+            return res.redirect("/listings");
+        }
+
+        // Construct the update object using new or existing values
         const updateData = {
             title: req.body.listing.title || currentListing.title,
             description: req.body.listing.description || currentListing.description,
             price: req.body.listing.price || currentListing.price,
             location: req.body.listing.location || currentListing.location,
             country: req.body.listing.country || currentListing.country,
+            category: req.body.listing.category || currentListing.category,
         };
 
         // Handle image update if a new file was uploaded
@@ -126,12 +159,45 @@ module.exports.updateListing = async (req, res) => {
             updateData.image = currentListing.image;
         }
 
+        // If location changed, update geocoding
+        if (req.body.listing.location && req.body.listing.location !== currentListing.location) {
+            try {
+                const geoResponse = await axios.get(
+                    `https://nominatim.openstreetmap.org/search`,
+                    {
+                        params: {
+                            format: 'json',
+                            q: req.body.listing.location,
+                            limit: 1,
+                        },
+                        headers: {
+                            'User-Agent': 'AuroraBnB/1.0 (your_email@example.com)'
+                        },
+                        timeout: 10000
+                    }
+                );
+
+                if (geoResponse.data.length > 0) {
+                    const { lat, lon } = geoResponse.data[0];
+                    updateData.geometry = {
+                        type: "Point",
+                        coordinates: [parseFloat(lon), parseFloat(lat)]
+                    };
+                }
+            } catch (geoError) {
+                console.warn('Geocoding failed during update:', geoError.message);
+                // Continue with update without geocoding
+            }
+        }
+
         // Update the listing
-        await Listing.findByIdAndUpdate(id, updateData);
+        await Listing.findByIdAndUpdate(id, updateData, { new: true });
 
         req.flash("success", "Listing Updated!");
         res.redirect(`/listings/${id}`);
+        
     } catch (err) {
+        console.error('Update error:', err);
         req.flash("error", "Failed to update listing");
         res.redirect(`/listings/${id}/edit`);
     }
@@ -164,7 +230,7 @@ module.exports.search = async(req, res) => {
     console.log(req.query.q);
     let input = req.query.q.trim().replace(/\s+/g, " "); //remove start and end space
     console.log(input);
-    if(input == "" || input == " "){
+    if(!input || input == "" || input == " "){
         //search value is empty
         req.flash("error", "Search value empty!!!");
         res.redirect("/listings");
@@ -249,3 +315,91 @@ module.exports.search = async(req, res) => {
         res.redirect("/listings");
     }
 }
+
+
+//Here is AI description:
+// Add this new method to your existing module.exports
+module.exports.generateDescription = async (req, res) => {
+    try {
+        // Extract data from request body
+        const { title, location, country, category, price } = req.body;
+        
+        if (!title || !location) {
+            console.log('Validation failed - missing title or location'); // Add this
+            return res.status(400).json({
+                success: false,
+                error: "Title and location are required"
+            });
+        
+        }
+
+        // Prepare data for AI service
+        const listingData = {
+            title: title.trim(),
+            location: location.trim(),
+            country: country ? country.trim() : 'Unknown',
+            category: category || 'General',
+            price: price || 0
+        };
+
+        console.log('Generating description for:', listingData);
+
+        // Get user ID for rate limiting (use logged-in user's ID)
+        const userId = req.user ? req.user._id.toString() : 'anonymous';
+
+        // Call AI service
+        const result = await aiService.generateDescription(listingData, userId);
+        
+        // Send response back to frontend
+        res.json(result);
+        
+    } catch (error) {
+        console.error('Controller Error Details :', error);
+        res.status(500).json({
+            success: false,
+            error: error.message || 'Internal server error' // Include actual error messag
+        });
+    }
+};
+
+
+// Add this method to your controller
+module.exports.enhanceDescription = async (req, res) => {
+    try {
+        // Extract data from request body
+        const { title, location, country, category, price, existingDescription } = req.body;
+        
+        // Validate required fields
+        if (!existingDescription || !existingDescription.trim()) {
+            return res.status(400).json({
+                success: false,
+                error: "Existing description is required for enhancement"
+            });
+        }
+
+        // Prepare data for AI service
+        const listingData = {
+            title: title ? title.trim() : '',
+            location: location ? location.trim() : '',
+            country: country ? country.trim() : 'Unknown',
+            category: category || 'General',
+            price: price || 0
+        };
+
+        // Get user ID for rate limiting
+        const userId = req.user ? req.user._id.toString() : 'anonymous';
+
+        // Call AI service enhancement method
+        const result = await aiService.enhanceDescription(existingDescription.trim(), listingData, userId);
+        
+        // Send response back to frontend
+        res.json(result);
+        
+    } catch (error) {
+        console.error('Enhancement Controller Error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Internal server error'
+        });
+    }
+};

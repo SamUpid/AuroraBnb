@@ -17,9 +17,13 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
 
+// Import routers
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
+
+// Import the listing controller for AI routes
+const listingController = require("./controllers/listings.js"); 
 
 // Database connection setup
 //const MONGO_URL = 'mongodb://127.0.0.1:27017/AuroraBnb';
@@ -35,24 +39,30 @@ async function main() {
     await mongoose.connect(dbUrl);
 }
 
-// async function main() {
-//     await mongoose.connect(MONGO_URL);
-// }
+
 
 // View engine setup
-app.set("view engine", "ejs"); // Set EJS as template engine
-app.set("views", path.join(__dirname, "views"));// Set views directory
-app.use(express.urlencoded({extended: true})); // Parse URL-encoded bodies
-app.use(methodOverride("_method"));// Enable method override
-app.engine('ejs', ejsMate); // Use ejs-mate for layouts
-app.use(express.static(path.join(__dirname, "/public"))); // Serve static files
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.use(express.urlencoded({extended: true}));
+app.use(express.json()); //Important for parsing JSON requests from AI endpoints
+app.use(methodOverride("_method"));
+app.engine('ejs', ejsMate);
+app.use(express.static(path.join(__dirname, "/public")));
+
+// Add CORS middleware
+const cors = require('cors');
+app.use(cors({
+    origin: 'http://localhost:8080',
+    credentials: true
+}));
 
 const store = MongoStore.create({
     mongoUrl: dbUrl,
     crypto: {
-        secret: process.env.SECRET,
+        secret: process.env.SECRET || 'fallback-secret-key', // Provide fallback
     },
-    touchAfter: 24* 3600,
+    touchAfter: 24* 3600, // session update
 });
 
 store.on("error", (err) =>{
@@ -62,23 +72,29 @@ store.on("error", (err) =>{
 // Session configuration
 const sessionOptions = {
     store,
-    secret: process.env.SECRET, // Secret for signing session ID cookie
-    resave: false, // Don't save session if unmodified
-    saveUninitialized: true, // Save new sessions
+    secret: process.env.SECRET || 'fallback-secret-for-development',
+    resave: false,
+    saveUninitialized: true,
     cookie: {
-        expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // 1 week expiration
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week max age
-        httpOnly: true, // Cookie not accessible via client-side JS
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000, //1 week
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production' // HTTPS in production
     },
 }
+
 // Initialize session and flash message
 app.use(session(sessionOptions));
 app.use(flash());
 
 // Passport authentication setup
-app.use(passport.initialize()); // Initialize passport
-app.use(passport.session()); // Enable persistent login sessions
-passport.use(new LocalStrategy(User.authenticate())); // Use local strategy
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+// Configure user serialization
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 // Middleware to make flash messages and user available to all templates
 app.use((req, res, next)=>{
@@ -88,26 +104,74 @@ app.use((req, res, next)=>{
     next();
 });
 
-// Configure user serialization
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
-
+// Routes
 app.get('/', (req, res) => {
-  res.redirect('/listings');
+    res.redirect('/listings');
 });
-
 
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
-// Error handler
-app.use((err, req, res, next) => {
-   let {statusCode = 500, message = "Something went wrong"} = err;
-   res.status(statusCode).render("error.ejs", {err, message});
+// AI description routes - these should work now
+app.post("/generate-description", listingController.generateDescription);
+app.post("/enhance-description", listingController.enhanceDescription);
+
+
+// Test route for OpenAI connection (useful for debugging)
+app.get('/test-openai', async (req, res) => {
+    try {
+        const aiService = require('./services/aiService');
+        const result = await aiService.testConnection();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: 'Failed to test AI service',
+            details: error.message
+        });
+    }
 });
 
-// Then start the server
-app.listen(8080, () => {
-    console.log("server is listening to port 8080");
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
+});
+
+//Global Error handler
+app.use((err, req, res, next) => {
+    let {statusCode = 500, message = "Something went wrong"} = err;
+    // Log error for debugging
+    console.error(`Error ${statusCode}: ${message}`);
+    if (process.env.NODE_ENV !== 'production') {
+        console.error(err.stack);
+    }
+    res.status(statusCode).render("error.ejs", {err, message});
+});
+
+
+
+// Start the server
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+    console.log(`\u{1F680} Server is running on port ${PORT}`);
+    console.log(`\u{1F4F1} App URL: http://localhost:${PORT}`);
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(`\u{1F9EA} Test AI: http://localhost:${PORT}/test-openai`);
+    }
+});
+
+// Graceful shutdown handling
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received. Shutting down gracefully...');
+    process.exit(0);
+});
+
+process.on('SIGINT', () => {
+    console.log('SIGINT received. Shutting down gracefully...');
+    process.exit(0);
 });

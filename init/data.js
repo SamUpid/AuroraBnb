@@ -8,7 +8,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1523650126631-9fafa6ed33fc?q=80&w=1734&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
-      price: 2500,
+      price: 250,
       location: "Budapest",
       country: "Hungary",
       geometry: {
@@ -26,7 +26,7 @@ const sampleListings = [
           filename: "listingimage",
           url: "https://images.unsplash.com/photo-1527419105721-af1f23c86dec?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         },
-        price: 1400,
+        price: 140,
         location: "Jaisalmer",
         country: "India",
         geometry: {
@@ -45,7 +45,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1721886473357-1563de6e6883?q=80&w=1867&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
-      price: 1400,
+      price: 140,
       location: "Patagonia",
       country: "Chile",
       geometry: {
@@ -64,7 +64,7 @@ const sampleListings = [
           filename: "listingimage",
           url: "https://images.unsplash.com/photo-1694085637025-6e4f9cb27d94?q=80&w=2148&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
-      price: 3200,
+      price: 320,
       location: "Dornie",
       country: "Scotland",
       geometry: {
@@ -82,7 +82,7 @@ const sampleListings = [
           filename: "listingimage",
           url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fHRyYXZlbHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
         },
-        price: 1200,
+        price: 120,
         location: "New York City",
         country: "United States",
         geometry: {
@@ -162,7 +162,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjB8fGhvdGVsc3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60",
       },
-      price: 2000,
+      price: 200,
       location: "Cancun",
       country: "Mexico",
       geometry: {
@@ -181,7 +181,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1683836145612-c5f827737bca?q=80&w=1933&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
-      price: 3200,
+      price: 320,
       location: "Santorini",
       country: "Greece",
       geometry: {
@@ -200,7 +200,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1622396481328-9b1b78cdd9fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8c2t5JTIwdmFjYXRpb258ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
       },
-      price: 3500,
+      price: 350,
       location: "Los Angeles",
       country: "United States",
       geometry: {
@@ -220,7 +220,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1502784444187-359ac186c5bb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fHNreSUyMHZhY2F0aW9ufGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
       },
-      price: 3000,
+      price: 300,
       location: "Verbier",
       country: "Switzerland",
       geometry: {
@@ -239,7 +239,7 @@ const sampleListings = [
       filename: "listingimage",
       url: "https://images.unsplash.com/photo-1657545165198-dfc38f164156?q=80&w=1335&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
-    price: 1700,
+    price: 170,
     location: "Bavaria",
     country: "Germany",
     geometry: {
@@ -258,7 +258,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1513786704796-b35842f0dca6?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
-      price: 2100,
+      price: 210,
       location: "Reykjavik",
       country: "Iceland",
       geometry: {
@@ -277,7 +277,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1618140052121-39fc6db33972?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8bG9kZ2V8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
       },
-      price: 10000,
+      price: 1000,
       location: "Fiji",
       country: "Fiji",
       geometry: {
@@ -296,7 +296,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1533619239233-6280475a633a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fHNreSUyMHZhY2F0aW9ufGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
       },
-      price: 2200,
+      price: 220,
       location: "Boston",
       country: "United States",
       geometry: {
@@ -315,7 +315,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1644027622521-d0ca669c40d7?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
-      price: 1800,
+      price: 180,
       location: "Nusa Penida",
       country: "Indonesia",
       geometry: {
@@ -334,7 +334,7 @@ const sampleListings = [
           filename: "listingimage",
           url: "https://images.unsplash.com/photo-1717329162563-2f93e83cc717?q=80&w=2274&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         },
-        price: 2800,
+        price: 280,
         location: "Chittorgarh", 
         country: "India",
         geometry: {
@@ -353,7 +353,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1521401830884-6c03c1c87ebb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGxvZGdlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
       },
-      price: 1500,
+      price: 150,
       location: "Banff",
       country: "Canada",
       geometry: {
@@ -371,7 +371,7 @@ const sampleListings = [
           filename: "listingimage",
           url: "https://images.unsplash.com/photo-1518684079-3c830dcef090?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZHViYWl8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&w=800&q=60",
         },
-        price: 5000,
+        price: 500,
         location: "Dubai",
         country: "United Arab Emirates",
         geometry: {
@@ -390,7 +390,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1470165301023-58dab8118cc9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fGxvZGdlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
       },
-      price: 3000,
+      price: 300,
       location: "Phuket",
       country: "Thailand",
       geometry: {
@@ -409,7 +409,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1586375300773-8384e3e4916f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTN8fGxvZGdlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
       },
-      price: 1100,
+      price: 110,
       location: "Montana",
       country: "United States",
        geometry: {
@@ -428,7 +428,7 @@ const sampleListings = [
             filename: "listingimage",
             url: "https://images.unsplash.com/photo-1600466403153-50193d187dde?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
           },
-          price: 3100,
+          price: 310,
           location: "Queenstown",
           country: "New Zealand",
           geometry: {
@@ -447,7 +447,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1587381420270-3e1a5b9e6904?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGxvZGdlfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
       },
-      price: 1600,
+      price: 160,
       location: "Charleston",
       country: "United States",
       geometry: {
@@ -466,7 +466,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1480796927426-f609979314bd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHRva3lvfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60",
       },
-      price: 2000,
+      price: 200,
       location: "Tokyo",
       country: "Japan",
       geometry: {
@@ -504,7 +504,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1675154092378-1ca4978ec6a5?q=80&w=1020&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
-      price: 6000,
+      price: 600,
       location: "Maldives",
       country: "Maldives",
       geometry: {
@@ -523,7 +523,7 @@ const sampleListings = [
         filename: "listingimage",
         url: "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?q=80&w=1738&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       },
-      price: 1900,
+      price: 190,
       location: "Alleppey",
       country: "India",
       geometry: {

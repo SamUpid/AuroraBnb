@@ -16,6 +16,13 @@ router.route("/")
 //New Route
 router.get("/new",isLoggedIn, listingController.renderNewForm);
 
+// AI Description Generation Route (NEW)
+router.post("/generate-description", isLoggedIn, wrapAsync(listingController.generateDescription));
+
+// Add this new route for enhancement
+router.post("/enhance-description", isLoggedIn, wrapAsync(listingController.enhanceDescription));
+
+
 router.get("/filter/:q", wrapAsync(listingController.filterListings));
 
 //search
@@ -29,5 +36,7 @@ router.route("/:id")
 
 //Edit Route
 router.get("/:id/edit",isLoggedIn,isOwner, wrapAsync(listingController.renderEditForm));
+
+
 
 module.exports = router;

@@ -1,4 +1,5 @@
 <% layout("/layouts/boilerplate") %>
+
     <div class="row mt-3">
     <div class="col-sm-8 offset-sm-2 px-3">
         <br/> <br/>
@@ -11,13 +12,60 @@
             required
             />
             <div class="valid-feedback">Title looks good!</div>
+            <div class="invalid-feedback">Please provide a valid title.</div>
         </div>
 
-        <div class="mb-3">
-             <label for="description" class="form-label">Description</label>
-            <textarea type="text" name="listing[description]"  class="form-control" required></textarea>
-            <div class="invalid-feedback">Please enter a short description</div>
-        </div>
+ <%# Description Field with AI Integration %>
+    <div class="mb-3">
+<label for="description" class="form-label">Description</label>
+<textarea type="text" name="listing[description]" id="listing-description" class="form-control" rows="4" placeholder="Describe your property...or use AI to generate one!"></textarea>
+
+<!-- AI Description Generation Section -->
+<div class="mt-2 d-flex flex-wrap gap-2 align-items-center">
+    <button type="button" id="generate-ai-description" class="btn btn-outline-primary btn-sm">
+        <i class="fas fa-magic"></i> Generate Description with AI
+    </button>
+    <button type="button" id="enhance-description" class="btn btn-outline-warning btn-sm" style="display: none;">
+        <i class="fas fa-sparkles"></i> Enhance Current
+    </button>
+    <small class="text-muted">Fill in title, location, country, and category first</small>
+    </div>
+
+    <%# Loading Indicator %>
+        <div id="ai-loading" class="mt-2" style="display: none;">
+            <div class="d-flex align-items-center text-primary">
+                 <div class="spinner-border spinner-border-sm me-2" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <small id="loading-text">Generating description...</small>
+                </div>
+         </div>
+
+   <%# AI Suggestion Display %>
+                <div id="ai-suggestion-container" class="mt-3" style="display: none;">
+                    <div class="alert alert-info border-0 shadow-sm">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-robot text-info me-2"></i>
+                            <h6 class="mb-0">AI Generated Description:</h6>
+                        </div>
+                        <div id="ai-generated-text" class="bg-white p-3 rounded border" style="font-style: italic; white-space: pre-wrap;"></div>
+                        <div class="mt-3 d-flex flex-wrap gap-2">
+                            <button type="button" id="use-ai-description" class="btn btn-success btn-sm">
+                                <i class="fas fa-check"></i> Use This
+                            </button>
+                            <button type="button" id="regenerate-description" class="btn btn-info btn-sm">
+                                <i class="fas fa-redo"></i> Regenerate
+                            </button>
+                            <button type="button" id="dismiss-ai-description" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-times"></i> Dismiss
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="invalid-feedback">Please enter a short description</div>
+            </div>
+
 
            <div class="mb-3">
             <label for="image" class="form-label">Uplode Listing Image</label>
@@ -73,8 +121,171 @@
 
         </div>
 
-        <button class="btn btn-dark add-btn mt-3">Add</button>
-        <br/> <br/>
-    </form>
+     
+            <%# Submit Button %>
+            <button class="btn btn-dark add-btn mt-3" type="submit">
+                <i class="fas fa-plus"></i> Create Listing
+            </button>
+            <br/> <br/>
+        </form>
     </div>
 </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const generateBtn = document.getElementById('generate-ai-description');
+    const descriptionField = document.getElementById('listing-description');
+    const aiSuggestionContainer = document.getElementById('ai-suggestion-container');
+    const aiGeneratedText = document.getElementById('ai-generated-text');
+    const useAiBtn = document.getElementById('use-ai-description');
+    const dismissAiBtn = document.getElementById('dismiss-ai-description');
+    const enhanceBtn = document.getElementById('enhance-description');
+    const regenerateBtn = document.getElementById('regenerate-description'); // ← ADD THIS LINE!
+
+    // Helper function to collect form data
+    function getFormData() {
+        return {
+            title: document.querySelector('input[name="listing[title]"]').value,
+            location: document.querySelector('input[name="listing[location]"]').value,
+            country: document.querySelector('input[name="listing[country]"]').value,
+            category: document.querySelector('select[name="listing[category]"]').value,
+            price: document.querySelector('input[name="listing[price]"]').value
+        };
+    }
+
+    // Helper function to validate required fields
+    function validateRequiredFields(data) {
+        if (!data.title || !data.location || !data.country || !data.category) {
+            alert('Please fill in title, location, country, and category first');
+            return false;
+        }
+        return true;
+    }
+
+    // Helper function to make API calls
+    async function generateDescription(buttonElement, loadingText) {
+        const formData = getFormData();
+        
+        if (!validateRequiredFields(formData)) {
+            return;
+        }
+
+        try {
+            buttonElement.disabled = true;
+            buttonElement.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${loadingText}`;
+
+            const response = await fetch('/generate-description', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                aiGeneratedText.textContent = data.description;
+                aiSuggestionContainer.style.display = 'block';
+                
+                // Show enhance button only if there's existing text
+                if (descriptionField.value.trim()) {
+                    enhanceBtn.style.display = 'inline-block';
+                } else {
+                    enhanceBtn.style.display = 'none';
+                }
+            } else {
+                alert('Failed to generate description: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to generate description. Please try again.');
+        } finally {
+            buttonElement.disabled = false;
+            // Reset button text based on which button was clicked
+            if (buttonElement === generateBtn) {
+                buttonElement.innerHTML = '<i class="fas fa-magic"></i> Generate Description with AI';
+            } else if (buttonElement === regenerateBtn) {
+                buttonElement.innerHTML = '<i class="fas fa-redo"></i> Regenerate';
+            }
+        }
+    }
+
+    // Generate button event listener
+    generateBtn.addEventListener('click', function() {
+        generateDescription(generateBtn, 'Generating...');
+    });
+
+    // ADD THIS: Regenerate button event listener
+    regenerateBtn.addEventListener('click', function() {
+        generateDescription(regenerateBtn, 'Regenerating...');
+    });
+
+    // Use AI description button
+    useAiBtn.addEventListener('click', function() {
+        descriptionField.value = aiGeneratedText.textContent;
+        aiSuggestionContainer.style.display = 'none';
+        
+        // Update enhance button visibility
+        enhanceBtn.style.display = descriptionField.value.trim() ? 'inline-block' : 'none';
+    });
+
+    // Dismiss button
+    dismissAiBtn.addEventListener('click', function() {
+        aiSuggestionContainer.style.display = 'none';
+    });
+
+    // Enhance description button
+    enhanceBtn.addEventListener('click', async function() {
+        const existingDescription = descriptionField.value;
+        
+        if (!existingDescription.trim()) {
+            alert('Please enter some text to enhance');
+            return;
+        }
+
+        try {
+            enhanceBtn.disabled = true;
+            enhanceBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enhancing...';
+
+            const formData = getFormData();
+
+            const response = await fetch('/enhance-description', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...formData,
+                    existingDescription
+                }),
+                credentials: 'include'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                aiGeneratedText.textContent = data.description;
+                aiSuggestionContainer.style.display = 'block';
+                useAiBtn.style.display = 'inline-block';
+                enhanceBtn.style.display = 'none';
+            } else {
+                alert('Failed to enhance description: ' + (data.error || 'Unknown error'));
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to enhance description. Please try again.');
+        } finally {
+            enhanceBtn.disabled = false;
+            enhanceBtn.innerHTML = '<i class="fas fa-sparkles"></i> Enhance Current';
+        }
+    });
+
+    // Update enhance button visibility when description field changes
+    descriptionField.addEventListener('input', function() {
+        enhanceBtn.style.display = descriptionField.value.trim() ? 'inline-block' : 'none';
+    });
+});
+</script>
