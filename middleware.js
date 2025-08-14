@@ -25,10 +25,42 @@ module.exports.isLoggedIn = (req, res, next) =>{
 module.exports.saveRedirectUrl = (req, res, next) => {
     if(req.session.redirectUrl){
         res.locals.redirectUrl = req.session.redirectUrl;
+         delete req.session.redirectUrl;
     }
     next();
 };
 
+
+/**
+ * Explicitly saves session before redirect to ensure flash messages persist
+ * Use this before redirects that need to preserve flash messages
+ */
+module.exports.saveSession = (req, res, next) => {
+    req.session.save((err) => {
+        if (err) {
+            console.error('Session save error:', err);
+            return next(err);
+        }
+        next();
+    });
+};
+
+/**
+ * Sets flash message and saves session to ensure message persists
+ */
+module.exports.setFlashAndSave = (req, type, message) => {
+    return new Promise((resolve, reject) => {
+        req.flash(type, message);
+        req.session.save((err) => {
+            if (err) {
+                console.error('Session save error after flash:', err);
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+    });
+};
 
 /**
  * Ownership Verification Middleware
