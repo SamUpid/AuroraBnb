@@ -248,7 +248,7 @@ store.on("error", (err) =>{
     console.log("ERROR in MONGO SESSION STORE", err);
 });
 
-// Session configuration - FIXED: Added httpOnly for security
+// Session configuration - : Added httpOnly for security
 const sessionOptions = {
     store,
     secret: process.env.SECRET || 'fallback-secret-for-development',
@@ -258,7 +258,9 @@ const sessionOptions = {
         expires: Date.now() + 7 * 24 * 60 * 60 * 1000, //1 week
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true, // Added for security
-        secure: process.env.NODE_ENV === 'production' // Only send over HTTPS in production
+        secure: process.env.NODE_ENV === 'production' && process.env.RENDER_EXTERNAL_URL ? true : false,
+        // : Add sameSite for better compatibility
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     },
 }
 
@@ -275,10 +277,10 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// FIXED: Add saveRedirectUrl middleware before the flash middleware
+// Add saveRedirectUrl middleware before the flash middleware
 app.use(saveRedirectUrl);
 
-// FIXED: Updated middleware to ensure flash messages persist
+// Updated middleware to ensure flash messages persist
 app.use((req, res, next)=>{
     // Get flash messages
     res.locals.success = req.flash("success");
